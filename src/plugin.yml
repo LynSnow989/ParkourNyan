@@ -1,0 +1,10 @@
+main: me.LynSnow.ParkourNyan.Main.ParkourNyan
+name: ParkourNyan
+version: 1.1
+author: LynSnow
+api-version: 1.15
+softdepend: [Vault]
+
+commands:
+  parkournyan:
+    aliases: pn
