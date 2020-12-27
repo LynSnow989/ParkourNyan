@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.LynSnow.ParkourNyan.FileManagers.LevelFile;
-import me.LynSnow.ParkourNyan.Main.ParkourEconomy;
+import me.LynSnow.ParkourNyan.Hooks.ParkourEconomy;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel;
 import me.LynSnow.ParkourNyan.Main.ParkourNyan;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel.Medal;

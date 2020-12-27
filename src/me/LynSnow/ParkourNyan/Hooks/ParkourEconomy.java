@@ -1,4 +1,4 @@
-package me.LynSnow.ParkourNyan.Main;
+package me.LynSnow.ParkourNyan.Hooks;
 
 import java.util.logging.Level;
 
@@ -14,6 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import me.LynSnow.ParkourNyan.Main.ParkourLevel;
+import me.LynSnow.ParkourNyan.Main.ParkourNyan;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel.Medal;
 import net.milkbowl.vault.economy.Economy;
 

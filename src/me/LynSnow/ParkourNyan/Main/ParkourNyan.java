@@ -12,13 +12,16 @@ import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import me.LynSnow.ParkourNyan.Commands.MyCommandExecutor;
 import me.LynSnow.ParkourNyan.FileManagers.LevelFile;
-import me.LynSnow.ParkourNyan.FileManagers.PlayerFile;
+import me.LynSnow.ParkourNyan.FileManagers.PlayerFile2;
+import me.LynSnow.ParkourNyan.Hooks.ParkourEconomy;
+import me.LynSnow.ParkourNyan.Hooks.PAPI.PAPIHook;
 import me.LynSnow.ParkourNyan.Listeners.ActionBlocker;
 import me.LynSnow.ParkourNyan.Listeners.MainListener;
 import me.LynSnow.ParkourNyan.Listeners.PlateListener;
@@ -28,9 +31,11 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ParkourNyan extends JavaPlugin {
 	
-	private ParkourEconomy eco = new ParkourEconomy(this);
-
-	private short t = 0;
+	private ParkourEconomy eco;
+	//private HDHook hd;
+	private PAPIHook papi;
+	
+	private int t = 0;
 	
 	private HashMap<UUID, ParkourPlayer> jugando = new HashMap<UUID, ParkourPlayer>();
 	private HashMap<String, ParkourLevel> niveles = new HashMap<String, ParkourLevel>();
@@ -47,9 +52,14 @@ public class ParkourNyan extends JavaPlugin {
 		
 		this.getCommand("parkournyan").setExecutor(new MyCommandExecutor(this));
 		
+		eco = new ParkourEconomy(this);
+		//hd = new HDHook(this);
+		papi = new PAPIHook(this);
+		
+		papi.register();
 		getEco().init();
 		
-		//detectar caidas cada 10 ticks (1/2 segundo)
+		//detectar caidas y mandar ActionBar cada 10 ticks (1/2 segundo)
         BukkitScheduler scheduler = getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
@@ -59,17 +69,15 @@ public class ParkourNyan extends JavaPlugin {
                 	if(p != null) {
                 		ParkourPlayer pp = entry.getValue();
                 		ParkourLevel l = getNiveles().get(entry.getValue().getLevel());
-                		pp.updateTimer();
-                		p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', pp.getTimeString(l))));
-                		if(t % 5 == 0) {
-		                	if(p.getLocation().getY() < l.getLow()) {
-		                		p.teleport(entry.getValue().getLastCP());
-		                	}
+                		if(p.getLocation().getY() < l.getLow()) {
+	                		p.teleport(entry.getValue().getLastCP());
 	                	}
+                    	p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', pp.getTimeString(l))));
                 	}
                 }
                 t++;
                 if(t >= 120) { // cada minuto 
+                	//cambiar por hook
                 	for(Map.Entry<UUID, HashMap<String, Long>> entry : getLevelCooldowns().entrySet()) {
                 		if(entry.getValue().isEmpty())
                 			getLevelCooldowns().remove(entry.getKey());
@@ -80,12 +88,18 @@ public class ParkourNyan extends JavaPlugin {
                 	t = 0;
                 }
             }
-        }, 0L, 2L);
+        }, 0L, 10L);
         
 		//cargar parkours
 		if(new File("plugins/ParkourNyan/niveles.data").exists()) {
 			niveles = LevelFile.load();
 			Bukkit.getLogger().log(Level.INFO, "[ParkourNyan] Se cargo correctamente el archivo de niveles");
+		}
+		
+		/*for(ParkourLevel lvl : niveles.values()) {
+			for(Location loc : lvl.getTables()) {
+				hd.createHD(lvl, loc);
+			}
 		}
 		
 		//cargar si hay gente en la db de inventarios y si hay, devolverlos
@@ -94,7 +108,7 @@ public class ParkourNyan extends JavaPlugin {
 			if(!getJugando().isEmpty()) {
 				Bukkit.getLogger().log(Level.INFO, "[ParkourNyan] Se encontro un archivo de jugadores, el plugin se cerro como es debido?");
 			}
-		}
+		}*/
 	}
 	
 	@Override
@@ -104,7 +118,7 @@ public class ParkourNyan extends JavaPlugin {
 		for(Map.Entry<UUID, ParkourPlayer> entry : getJugando().entrySet()) {
 			kickPlayer(entry.getKey(), "&cEl plugin ha sido desactivado.");
 		}
-		new PlayerFile(getJugando()).save();
+		//new PlayerFile(getJugando()).save();
 	}
 	
 	public boolean existeNivel(CommandSender sender, String nom) {
@@ -126,7 +140,11 @@ public class ParkourNyan extends JavaPlugin {
 				p.getPlayer().showPlayer(this, pl);
 			}
 			p.teleport(pp.getExit(), TeleportCause.PLUGIN);
-			p.getInventory().setContents(pp.getInventory());
+			final ItemStack[] inv = PlayerFile2.load(p.getUniqueId());
+			if(inv == null)
+				p.getInventory().clear();
+			else
+				p.getInventory().setContents(inv);
 			p.sendMessage(ChatColor.translateAlternateColorCodes('&', razon));
 			p.setGameMode(GameMode.SURVIVAL);
 			p.setFoodLevel(pp.getFood());
@@ -159,6 +177,14 @@ public class ParkourNyan extends JavaPlugin {
 
 	public HashMap<UUID, HashMap<String, Long>> getLevelCooldowns() {
 		return levelCooldowns;
+	}
+	
+	/*public HDHook getHDHook() {
+		return this.hd;
+	}*/
+	
+	public PAPIHook getPAPIHook() {
+		return this.papi;
 	}
 	
 }

@@ -3,17 +3,17 @@ package me.LynSnow.ParkourNyan.Main;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 public class ParkourPlayer implements Serializable{
 	private static transient final long serialVersionUID = -1681012206529286338L;
 
-	private ItemStack[] inventory;
+	//private ItemStack[] inventory;
 	private int food;
 	private double hp;
-	private int timer;
+	private long startTime;
 	private float exhaust;
 	private Collection<PotionEffect> effects;
 	private String level;
@@ -21,8 +21,8 @@ public class ParkourPlayer implements Serializable{
 	private Location lastCP;
 	private boolean onCD;
 	
-	public ParkourPlayer(ItemStack[] inv,int food, float exhaust, double hp, Collection<PotionEffect> effects, ParkourLevel level, boolean onCD) {
-		this.inventory = inv;
+	public ParkourPlayer(int food, float exhaust, double hp, Collection<PotionEffect> effects, ParkourLevel level, boolean onCD) {
+		//this.inventory = inv;
 		this.food = food;
 		this.exhaust = exhaust;
 		this.hp = hp;
@@ -31,12 +31,10 @@ public class ParkourPlayer implements Serializable{
 		this.exit = level.getExit();
 		this.lastCP = level.getInicio();
 		this.onCD = onCD;
-		this.timer = 0;
+		this.startTime = System.currentTimeMillis();
 	}
 	
-	public ItemStack[] getInventory() {
-		return this.inventory;
-	}
+
 	public String getLevel() {
 		return this.level;
 	}
@@ -68,14 +66,16 @@ public class ParkourPlayer implements Serializable{
 		return this.onCD;
 	}
 	
-	public int getTimer() {
-		return this.timer;
+	public long getStartTime() {
+		return this.startTime;
 	}
 	
 	public String getTimeString(ParkourLevel level) {
 		
+		int time = (int) (System.currentTimeMillis() - startTime)/1000;
+		
 		String color = "";
-		switch(level.compareMedal(this.getTimer())) {
+		switch(level.compareMedal(this.startTime)) {
 		case GOLD:
 			color = "&e";
 			break;
@@ -90,21 +90,16 @@ public class ParkourPlayer implements Serializable{
 			break;
 		}
 		
-		if(timer != 0) {
+		if(time != 0) {
 			int m = 0;
-			int s = 0;
-			int ms = timer;
-			if(ms >= 6000) {
-				m = new Double(Math.floor(ms/6000)).intValue();
-				ms = new Double(Math.floorMod(ms, 6000)).intValue();
+			int s = time;
+			if(s >= 60) {
+				m = new Double(Math.floor(s/60)).intValue();
+				s = new Double(Math.floorMod(s, 60)).intValue();
 			}
-			if(ms >= 100) {
-				s = new Double(Math.floor(ms/100)).intValue();
-				ms = new Double(Math.floorMod(ms, 100)).intValue();
-			}
-			return String.format(color + "&l%02d:%02d:%02d", m, s, ms);
+			return String.format(color + "&l%02d:%02d", m, s);
 		} else {
-			return "&e--:--:--";
+			return color + ChatColor.BOLD + "00:00";
 		}
 	}
 	
@@ -112,13 +107,10 @@ public class ParkourPlayer implements Serializable{
 	public void setLastCP(Location cp) {
 		this.lastCP = cp;
 	}
-	
-	public void updateTimer() {
-		this.timer += 10;
-	}
+
 	
 	public void resetTimer() {
-		this.timer = 0;
+		this.startTime = System.currentTimeMillis();
 	}
 	
 }

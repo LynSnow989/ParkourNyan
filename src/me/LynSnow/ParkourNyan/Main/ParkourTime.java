@@ -23,14 +23,15 @@ public class ParkourTime implements Serializable {
 			int m = 0;
 			int s = 0;
 			int ms = time;
-			if(ms >= 6000) {
-				m = new Double(Math.floor(ms/6000)).intValue();
-				ms = new Double(Math.floorMod(ms, 6000)).intValue();
+			if(ms >= 60000) {
+				m = new Double(Math.floor(ms/60000)).intValue();
+				ms = new Double(Math.floorMod(ms, 60000)).intValue();
 			}
 			if(ms >= 100) {
-				s = new Double(Math.floor(ms/100)).intValue();
-				ms = new Double(Math.floorMod(ms, 100)).intValue();
+				s = new Double(Math.floor(ms/1000)).intValue();
+				ms = new Double(Math.floorMod(ms, 1000)).intValue();
 			}
+			ms = ms/10;
 			return name + " > " + String.format("%02d:%02d:%02d", m, s, ms);
 		} else {
 			return name + " >  --:--:--";

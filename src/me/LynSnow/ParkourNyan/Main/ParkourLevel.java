@@ -40,6 +40,8 @@ public class ParkourLevel implements Serializable {
 	private int[] medal = new int[3];
 	
 	private ParkourTime[] best = new ParkourTime[5];
+	private List<Location> tables;
+	
 	private ParkourDisplay timeTable = null;
 	
 	public ParkourLevel(String nombre, String display) {
@@ -47,6 +49,7 @@ public class ParkourLevel implements Serializable {
 		this.displayName = display;
 		enabled = false;
 		alturaMin = 0;
+		tables = new ArrayList<>();
 		
 		for(int i = 0; i < 4; i++) {
 			prizeM[i] = 0;
@@ -144,6 +147,10 @@ public class ParkourLevel implements Serializable {
 	
 	public void setBest(ParkourTime[] times) {
 		this.best = times;
+	}
+	
+	public List<Location> getTables(){
+		return this.tables;
 	}
 	
 	public boolean newTimeTable(Player p) {
@@ -367,20 +374,22 @@ public class ParkourLevel implements Serializable {
 		}
 	}
 	
-	public Medal compareMedal(int t) {
+	public Medal compareMedal(long startTime) {
+		int t = (int) (System.currentTimeMillis() - startTime)/1000;
+		
 		Medal m = Medal.GENERAL;
 		if(this.hasMedal(Medal.BRONZE)) {
-			if(t <= this.medal[0]*100) {
+			if(t <= this.medal[0]) {
 				m = Medal.BRONZE;
 			}
 		}
 		if(this.hasMedal(Medal.SILVER)) {
-			if(t <= this.medal[1]*100) {
+			if(t <= this.medal[1]) {
 				m = Medal.SILVER;
 			}
 		}
 		if(this.hasMedal(Medal.GOLD)) {
-			if(t <= this.medal[2]*100) {
+			if(t <= this.medal[2]) {
 				m = Medal.GOLD;
 			}
 		}

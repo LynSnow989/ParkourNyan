@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="D:/Files/JUEGOS/Plugins/spigot-1.15.2.jar"/>
 	<classpathentry kind="lib" path="D:/Files/JUEGOS/Plugins/Others/Vault.jar"/>
+	<classpathentry kind="lib" path="D:/Files/JUEGOS/Plugins/Others/HolographicDisplays-2.4.5.jar"/>
+	<classpathentry kind="lib" path="D:/Files/JUEGOS/Plugins/Others/PlaceholderAPI-2.10.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
 import me.LynSnow.ParkourNyan.FileManagers.LevelFile;
-import me.LynSnow.ParkourNyan.FileManagers.PlayerFile;
+import me.LynSnow.ParkourNyan.FileManagers.PlayerFile2;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel.Medal;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel.TipoPos;
@@ -111,15 +111,15 @@ public class PlateListener implements Listener{
 				}
 			}
 			
-			ParkourPlayer tmpPlayer = new ParkourPlayer(p.getInventory().getContents(),
-														p.getFoodLevel(), 
+			ParkourPlayer tmpPlayer = new ParkourPlayer(p.getFoodLevel(), 
 														p.getExhaustion(),
 														p.getHealth(),
 														p.getActivePotionEffects(),
 														nivel,
 														onCD);
 			plugin.getJugando().put(p.getUniqueId(), tmpPlayer);
-			new PlayerFile(plugin.getJugando()).save();
+			//new PlayerFile(plugin.getJugando()).save();
+			new PlayerFile2(p.getInventory().getContents()).save(p.getUniqueId());
 			setInvParkour(p);
 			p.setFoodLevel(20);
 			p.setExhaustion(0);
@@ -136,9 +136,14 @@ public class PlateListener implements Listener{
 		if(plugin.getJugando().containsKey(p.getUniqueId())) {
 			ParkourPlayer pp = plugin.getJugando().get(p.getUniqueId()); 
 			if(pp.getLevel().equals(nivel.getNombre())) {
-				p.getInventory().setContents(pp.getInventory());
+				//p.getInventory().setContents(pp.getInventory());
+				final ItemStack[] inv = PlayerFile2.load(p.getUniqueId());
+				if(inv == null)
+					p.getInventory().clear();
+				else
+					p.getInventory().setContents(inv);
 				p.setFoodLevel(pp.getFood());
-				p.setHealth(pp.getHP());
+				p.setHealth(Math.max(20.0,pp.getHP()));
 				p.setExhaustion(pp.getExhaust());
 				for(PotionEffect effect : pp.getEffects()) {
 					p.addPotionEffect(effect);
@@ -146,7 +151,7 @@ public class PlateListener implements Listener{
 				p.setGameMode(GameMode.SURVIVAL);
 				if(!pp.isOnCD()) {
 					boolean lleno = false;
-					Medal tipo = nivel.compareMedal(pp.getTimer());								
+					Medal tipo = nivel.compareMedal(pp.getStartTime());								
 					
 					List<ItemStack> items = new ArrayList<>();
 					int mon = 0;
@@ -214,7 +219,7 @@ public class PlateListener implements Listener{
 					p.showPlayer(plugin, pl);
 				}
 				
-				int puesto = nivel.addTime(new ParkourTime(p.getName(), pp.getTimer()));
+				int puesto = nivel.addTime(new ParkourTime(p.getName(), (int) (System.currentTimeMillis() - pp.getStartTime())));
 				if(puesto != 0) {
 					plugin.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', 
 							"&f[&bParkour&f] &a&l" + p.getName()  + "&b ha conseguido el puesto &a&lN°"+ puesto + "&b en el parkour " + nivel.getDisplay() + "&b!"));
@@ -225,7 +230,7 @@ public class PlateListener implements Listener{
 				plugin.getJugando().remove(p.getUniqueId());
 				plugin.getItemCooldowns().remove(p.getUniqueId());
 
-				new PlayerFile(plugin.getJugando()).save();
+				//new PlayerFile(plugin.getJugando()).save();
 			}
 		}
 	}

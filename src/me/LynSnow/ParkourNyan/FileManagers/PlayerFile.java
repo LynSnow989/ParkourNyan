@@ -17,6 +17,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import me.LynSnow.ParkourNyan.Main.ParkourPlayer;
 
+@Deprecated
 public class PlayerFile implements Serializable{
 	private static transient final long serialVersionUID = -1681012206529286338L;
 	

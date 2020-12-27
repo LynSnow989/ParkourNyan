@@ -10,13 +10,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.LynSnow.ParkourNyan.FileManagers.LevelFile;
-import me.LynSnow.ParkourNyan.FileManagers.PlayerFile;
+import me.LynSnow.ParkourNyan.FileManagers.PlayerFile2;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel;
 import me.LynSnow.ParkourNyan.Main.ParkourLevel.Medal;
 import me.LynSnow.ParkourNyan.Main.ParkourNyan;
@@ -144,6 +146,16 @@ public class MainListener implements Listener{
 			}
 		}
 	}
+	
+	@EventHandler
+	public void onFall(PlayerMoveEvent ev) {
+		final Player p = ev.getPlayer();
+		if(p.getFallDistance() > 10F) {
+			if(plugin.getJugando().containsKey(p.getUniqueId())) {
+				
+			}
+		}
+	}
 
 	@EventHandler
 	public void onGUIClose(InventoryCloseEvent ev) {
@@ -208,9 +220,16 @@ public class MainListener implements Listener{
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent ev) {
 		Player p = ev.getPlayer();
+		ItemStack[] inv = PlayerFile2.load(p.getUniqueId());
+		if(inv != null)
+			p.getInventory().setContents(inv);
+	}
+	
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent ev) {
+		final Player p = ev.getPlayer();
 		if(plugin.getJugando().containsKey(p.getUniqueId())) {
-			plugin.kickPlayer(p.getUniqueId(), "&cTe desconectaste en el parkour.");
-			new PlayerFile(plugin.getJugando()).save();
+			plugin.kickPlayer(p.getUniqueId(), "Desconectado");
 		}
 	}
 	

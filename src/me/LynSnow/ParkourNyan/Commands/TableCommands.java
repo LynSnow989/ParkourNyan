@@ -37,6 +37,7 @@ public class TableCommands {
 					sender.sendMessage(ChatColor.RED + "Asegurate de que la tabla anterior esté cargada o eliminala primero.");
 					return;
 				}
+				//plugin.getHDHook().createHD(nivel, ((Player) sender).getLocation());
 				sender.sendMessage(ChatColor.GREEN + "Tabla creada!");
 				break;
 			case "delete":
